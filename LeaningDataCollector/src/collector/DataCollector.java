@@ -1,11 +1,16 @@
 package collector;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 
 public class DataCollector {
+	static final String TEST_DIR_PASS = "C:\\Users\\sakailab\\Desktop\\PRO2015-第2回課題提出-141_20159208930";
+	static final String TEST_CSV_PASS = "C:/Users/sakailab/Desktop/javablock.csv";
 	DevideJavaAndBlock djb;
 	ProgrammingTimeCollector ptc;
 	String[] studentNames;
@@ -67,15 +72,38 @@ public class DataCollector {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		csvFileWriter();
+	}
+
+	public void csvFileWriter() {
+		// String path = "aaa";
+		// System.out.println("出力先のフォルダを選択");
+		// try (BufferedReader in = new BufferedReader(new
+		// InputStreamReader(System.in))) {
+		// path = in.readLine();
+		// } catch (IOException ex) {
+		// ex.printStackTrace();
+		// }
+		try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(TEST_CSV_PASS, false)));) { // なぜかnullぽ
+			pw.println("StudentName" + "," + "Java times " + "," + "Block times");
+			for (int i = 0; i < logFiles.length; i++) {
+				pw.println((studentNames[i] + "," + ptc.getTextFocusTime()[i] + "," + ptc.getBlockFocusTime()[i]));
+
+			}
+
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		System.out.println("csv書き出し完了");
 	}
 
 	public static void main(String[] args) throws IOException {
 		DataCollector dc;
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("学習者のプロジェクトファイル一覧がある階層のパス");
-
-		dc = new DataCollector(in.readLine());
+		dc = new DataCollector(TEST_DIR_PASS);
+		// dc = new DataCollector(in.readLine());
+		in.close();
 		dc.run();
 
 	}
