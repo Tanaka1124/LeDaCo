@@ -76,15 +76,11 @@ public class DataCollector {
 	}
 
 	public void csvFileWriter() {
-		// String path = "aaa";
-		// System.out.println("出力先のフォルダを選択");
-		// try (BufferedReader in = new BufferedReader(new
-		// InputStreamReader(System.in))) {
-		// path = in.readLine();
-		// } catch (IOException ex) {
-		// ex.printStackTrace();
-		// }
-		try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(TEST_CSV_PASS, false)));) { // なぜかnullぽ
+
+		System.out.println("出力先のフォルダを選択");
+
+		try (BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(TEST_CSV_PASS, false)));) { // なぜかnullぽ
 			pw.println("StudentName" + "," + "Java times " + "," + "Block times");
 			for (int i = 0; i < logFiles.length; i++) {
 				pw.println((studentNames[i] + "," + ptc.getTextFocusTime()[i] + "," + ptc.getBlockFocusTime()[i]));
@@ -101,10 +97,15 @@ public class DataCollector {
 		DataCollector dc;
 		BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 		System.out.println("学習者のプロジェクトファイル一覧がある階層のパス");
-		dc = new DataCollector(TEST_DIR_PASS);
-		// dc = new DataCollector(in.readLine());
-		in.close();
-		dc.run();
+//		dc = new DataCollector(TEST_DIR_PASS);
+		 dc = new DataCollector(in.readLine());
 
+		dc.run();
+		try {
+			in.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
