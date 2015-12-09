@@ -10,20 +10,20 @@ public class PictSizeCal {
 		printSizes = new long[length];
 
 		printLog("BlockPrint計量開始");
+		int studentNum = 0;
 		for (File f : rootFile.listFiles()) {
 			File buf = new File(f, "\\.pres2\\BlockPrint");
 
 			if (buf.exists()) {
-				int i = 0;
-				for (File p : f.listFiles()) {
-					printSizes[i] += p.length();
-
+				for (File p : buf.listFiles()) {
+					printSizes[studentNum] += p.length();
 				}
-				printSizes[i] = printSizes[i] / 1000;
-
+				printSizes[studentNum] = printSizes[studentNum] / 1000;
 			} else {
-
+				printSizes[studentNum] = 0;
 			}
+			System.out.println(printSizes[studentNum] + "KB");
+			studentNum++;
 		}
 		printLog("BlockPrint計量終了");
 
