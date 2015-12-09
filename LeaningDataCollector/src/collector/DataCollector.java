@@ -13,15 +13,18 @@ public class DataCollector {
 	static final String TEST_CSV_PASS = "C:/Users/sakailab/Desktop/javablock.csv";
 	DevideJavaAndBlock djb;
 	ProgrammingTimeCollector ptc;
+	PictSizeCal psc; 
 	String[] studentNames;
 	File[] logFiles;
 	File rootFile = null;
-
+	long[] pictSize;
+ 
 	public DataCollector(String pf) {
 		rootFile = new File(pf);
 		printLog(rootFile.getName() + "内のデータを集めます");
 		studentNames = getStudentNames();
 		logFiles = getLogFiles();
+		psc = new PictSizeCal();
 	}
 
 	private String[] getStudentNames() {
@@ -67,12 +70,16 @@ public class DataCollector {
 
 	private void run() {
 		djb = new DevideJavaAndBlock();
+		pictSize = psc.getSize(rootFile,studentNames.length);
 		try {
 			ptc = new ProgrammingTimeCollector(logFiles);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		csvFileWriter();
+		System.out.println("BlockPrint総サイズ:"+psc.getTotalSise()+"KB");
+		
 	}
 
 	public void csvFileWriter() {
@@ -81,16 +88,17 @@ public class DataCollector {
 
 		try (BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
 				PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(TEST_CSV_PASS, false)));) { // なぜかnullぽ
-			pw.println("StudentName" + "," + "Java times " + "," + "Block times");
+			printLog("csv書き出し開始");
+			pw.println("StudentName,Java times,Block times,BlockPrintSize(KB)");
 			for (int i = 0; i < logFiles.length; i++) {
-				pw.println((studentNames[i] + "," + ptc.getTextFocusTime()[i] + "," + ptc.getBlockFocusTime()[i]));
+				pw.println((studentNames[i] + "," + ptc.getTextFocusTime()[i] + "," + ptc.getBlockFocusTime()[i] +","+psc.getPrintSizes()[i] ));
 
 			}
 
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
-		System.out.println("csv書き出し完了");
+		printLog("csv書き出し完了");
 	}
 
 	public static void main(String[] args) throws IOException {
