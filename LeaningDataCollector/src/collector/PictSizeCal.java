@@ -2,7 +2,7 @@ package collector;
 
 import java.io.File;
 
-public class PictSizeCal {
+public class PictSizeCal extends PrintTemplate {
 	private long[] printSizes;
 	private long totalSise;
 
@@ -22,7 +22,7 @@ public class PictSizeCal {
 			} else {
 				printSizes[studentNum] = 0;
 			}
-			System.out.println(printSizes[studentNum] + "KB");
+			// System.out.println(printSizes[studentNum] + "KB");
 			studentNum++;
 		}
 		printLog("BlockPrint計量終了");
@@ -41,12 +41,6 @@ public class PictSizeCal {
 
 	public long getTotalSise() {
 		return totalSise;
-	}
-
-	private void printLog(String s) {
-
-		System.out.println("---------------" + s + "---------------");
-
 	}
 
 }
