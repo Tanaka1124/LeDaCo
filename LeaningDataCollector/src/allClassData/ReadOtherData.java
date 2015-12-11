@@ -9,10 +9,11 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class ReadOtherData {
-
+	String experiencedStudentsPath = ".\\data2read\\experiencedStudent.csv";
 	String studentListPath = ".\\data2read\\studentsList.csv";
 	List<Integer> studentNum = new ArrayList<>();
 	List<String> studentName = new ArrayList<>();
+	List<Integer> expStudenNum = new ArrayList<>();
 
 	public ReadOtherData() {
 		setStudentData();
@@ -64,5 +65,22 @@ public class ReadOtherData {
 	public static void main(String[] args) {
 		ReadOtherData rod = new ReadOtherData();
 		rod.getStudentNumber();
+	}
+
+	public Integer[] experiStudent() {
+		try (FileReader fr = new FileReader(new File(experiencedStudentsPath).getAbsolutePath().toString());
+				BufferedReader br = new BufferedReader(fr)) {
+
+			String line;
+			StringTokenizer token;
+			while ((line = br.readLine()) != null) {
+				token = new StringTokenizer(line, ",");
+				expStudenNum.add(Integer.parseInt(token.nextToken()));
+			}
+			br.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		return (Integer[]) expStudenNum.toArray(new Integer[0]);
 	}
 }

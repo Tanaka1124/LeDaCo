@@ -8,12 +8,21 @@ import java.util.Map;
 public class TaskData {
 
 	Map<String, TaskDetail> taskData = new HashMap<>();
+	File pres2LogPath;
+	TaskDetail td;
+
+	TaskDetailCal tdc = new TaskDetailCal();
 
 	public Map<String, TaskDetail> createTaskData(File f) {
+		pres2LogPath = new File(f, ".pres2\\pres2.log");
 		File[] javaFiles = searchJavaFiles(f);
-		for (File jf : javaFiles) {
-			System.out.println("   CreateTask" + jf.toString());
-			taskData.put(jf.toString(), new TaskDetail(jf));
+		if (javaFiles != null) {
+			for (File jf : javaFiles) {
+				// System.out.println(" CreateTask" + jf.toString());
+				td = new TaskDetail(jf);
+				taskData.put(jf.getName(), td);
+			}
+			tdc.setTaskData(pres2LogPath, javaFiles, taskData);
 		}
 		return taskData;
 	}

@@ -14,14 +14,35 @@ public class CollectAllDataMain {
 	public static void main(String[] args) {
 		setAllProjectRoot();
 		CollectAllDataMain cdm = new CollectAllDataMain();
-		cdm.madeAllDataframe();
+		cdm.makeAllDataframe();
+		cdm.exportCSVTest();
 	}
 
-	private void madeAllDataframe() {
+	private void makeAllDataframe() {
 		File[] lectures = searchLectures();
 		sd = new StudentData(lectures);
-		System.out.println("CreateDataReady");
+		// System.out.println("CreateDataReady");
 		sd.createStudentData(rod.getStudentNumber(), rod.getStudentName());
+		Integer[] experiStudents = importExperiencedStudent();
+	}
+
+	private Integer[] importExperiencedStudent() {
+		return rod.experiStudent();
+	}
+
+	private void exportCSVTest() {
+		// System.out.println(sd.student.get(70511002).get("lecture03").get("House.java"));
+		// System.out.println(sd.student.get(70511003).get("lecture03").get("House.java"));
+
+		for (Integer sn : rod.getStudentNumber()) {
+			try {
+				System.out.println(
+						(sd.student.get(sn).get("lecture03").get("Grade.java").BlockProgrammingTime) / 1000 / 60);
+			} catch (NullPointerException e) {
+
+			}
+		}
+
 	}
 
 	private File[] searchLectures() {

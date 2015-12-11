@@ -15,7 +15,7 @@ public class LectureData {
 
 		File[] submittedLectures = searchSubmittedLectures(lectures, studentNum);
 		for (File f : submittedLectures) {
-			System.out.println("  CreateData" + f.getName());
+			// System.out.println(" CreateData" + f.getName());
 
 			lecture.put(f.getParentFile().getName(), td.createTaskData(f));
 

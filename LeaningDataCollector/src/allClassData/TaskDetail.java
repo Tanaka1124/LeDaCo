@@ -6,8 +6,8 @@ public class TaskDetail {
 	File taskPath;
 	File pres2logPath;
 
-	int JavaProgrammingTime;
-	int BlockProgrammingTime;
+	long JavaProgrammingTime;
+	long BlockProgrammingTime;
 	int BlockPrintSize;
 	int CompileCount;
 	int CompileCorrectionTime;
