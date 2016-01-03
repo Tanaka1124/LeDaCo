@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class CollectAllDataMain {
-	public static final String TARGET_FILES = ".\\targetFiles";
+	public static final String TARGET_FILES = "..\\targetFiles";
 	public static String allProjectDataRoot;
 	ReadOtherData rod = new ReadOtherData();
 	StudentData sd;
@@ -21,9 +21,9 @@ public class CollectAllDataMain {
 	private void makeAllDataframe() {
 		File[] lectures = searchLectures();
 		sd = new StudentData(lectures);
-		// System.out.println("CreateDataReady");
+		 System.out.println("CreateDataReady");
 		sd.createStudentData(rod.getStudentNumber(), rod.getStudentName());
-		Integer[] experiStudents = importExperiencedStudent();
+//		Integer[] experiStudents = importExperiencedStudent();
 	}
 
 	private Integer[] importExperiencedStudent() {
@@ -37,7 +37,7 @@ public class CollectAllDataMain {
 		for (Integer sn : rod.getStudentNumber()) {
 			try {
 				System.out.println(
-						(sd.student.get(sn).get("lecture03").get("Grade.java").BlockProgrammingTime) / 1000 / 60);
+						(sd.student.get(sn).get("lecture03").get("Grade.java").JavaProgrammingTime) / 1000 / 60);
 			} catch (NullPointerException e) {
 
 			}

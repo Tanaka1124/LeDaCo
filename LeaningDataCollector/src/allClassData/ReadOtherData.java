@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 public class ReadOtherData {
-	String experiencedStudentsPath = ".\\data2read\\experiencedStudent.csv";
-	String studentListPath = ".\\data2read\\studentsList.csv";
+	String experiencedStudentsPath = "..\\data2read\\experiencedStudent.csv";
+	String studentListPath = "..\\data2read\\studentsList.csv";
 	List<Integer> studentNum = new ArrayList<>();
 	List<String> studentName = new ArrayList<>();
 	List<Integer> expStudenNum = new ArrayList<>();
