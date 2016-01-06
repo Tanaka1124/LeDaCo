@@ -2,14 +2,9 @@ package allCollectDaraPres;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,17 +21,19 @@ import javax.swing.UIManager;
 
 import clib.common.filesystem.CDirectory;
 import clib.common.filesystem.CPath;
-import pres.loader.model.PLFile;
-import pres.loader.model.PLProject;
-import pres.loader.utils.PLMetricsCalculator;
 
 public class DataController {
 	private JFrame mainFrame;
 	private JFrame identificationFrame;
+	private JFrame dataSaveFrame;
 
 	private LoadTaskPanel loadTaskPanel;
 	private LoadTaskNamePanel loadTNPanel;
 	private LoadStudentNamePane loadSNPanel;
+
+	private NameIdentification nameIdenti;
+	private CollectData collectData;
+	private SaveAsCSV saveAsCSV;
 
 	private List<BeforeAfterPanel> BAPanel;
 	private JPanel identificationPane;
@@ -50,18 +47,17 @@ public class DataController {
 	private File taskNamePath;
 	private File studentNamePath;
 
-	private Map<String, String> tmpIdentifiNames;
 	private Map<String, String> identifiNames;
 	private Set<String> existTaskNames;
 	private List<String> mustCheckTaskNames;
 	private List<Integer> studentNums;
-	private Map<Integer, Map<String, Integer>> collectedCompileCount;
 
 	public DataController() {
 		initializer();
 	}
 
 	void initializer() {
+		// データを読み込む為のウインドウの作成
 		mainFrame = new JFrame("DaraCollector");
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setSize(400, 200);
@@ -71,30 +67,36 @@ public class DataController {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
+		// パネルをセット
 		loadSNPanel = new LoadStudentNamePane(this);
 		loadTaskPanel = new LoadTaskPanel(this);
 		loadTNPanel = new LoadTaskNamePanel(this);
 
 		taskLoadButton = new JButton("名寄せ開始");
 		statusText = new JLabel("待機中");
+
 		taskLoadButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// テキストボックス内の各pathを取得
 				String rootTmp = loadTaskPanel.getRootPathArea().getText();
 				String TNTmp = loadTNPanel.getTaskNamePathBox().getText();
 				String SNTmp = loadSNPanel.getTaskNamePathBox().getText();
 				if (!rootTmp.equals("") && !TNTmp.equals("") && !SNTmp.equals("")) {
+
 					taskRootPath = new CDirectory(new CPath(rootTmp));
 					taskNamePath = new File(TNTmp);
 					studentNamePath = new File(SNTmp);
-					statusText.setText("存在する課題名の探索開始");
-					mainFrame.repaint();
-					studentNums = loadSNPanel.getStudentData(studentNamePath.toString());
-					mustCheckTaskNames = loadTNPanel.loadCSVString(taskNamePath.toString());
-					nameIdentification();
 
+					// 学籍番号のデータの読み込み
+					studentNums = loadSNPanel.getStudentData(studentNamePath.toString());
+					// 提出課題名の読み込み
+					mustCheckTaskNames = loadTNPanel.loadCSVString(taskNamePath.toString());
+					// 名寄せ開始
+					nameIdenti = new NameIdentification();
+					existTaskNames = nameIdenti.collectExistTaskName(taskRootPath.getDirectoryChildren());
+					makeIdentificationFrame();
 				} else {
 					statusText.setText("各データのパスをセットしてから押してください");
 					mainFrame.repaint();
@@ -118,42 +120,8 @@ public class DataController {
 		return mainFrame;
 	}
 
-	private void nameIdentification() {
-		List<CDirectory> lectures;
-		lectures = taskRootPath.getDirectoryChildren();
-		existTaskNames = new HashSet<>();
-		for (CDirectory lec : lectures) {
-			System.out.println(lec.toString() + " start");
-			List<CDirectory> students;
-			students = lec.getDirectoryChildren();
-			for (CDirectory sd : students) {
-				try {
-					PLProject pr = new PLProject(sd.getNameByString(), sd, sd.getAbsolutePath());
-					pr.load();
-					for (PLFile plFile : pr.getRootPackage().getFilesRecursively()) {
-						existTaskNames.add(plFile.getName());
-						statusText.setText("探索" + plFile.getName());
-						mainFrame.repaint();
-						// PLMetricsCalculator calc = new
-						// PLMetricsCalculator(plFile);
-					}
-				} catch (Exception e) {
-					System.err.println(e);
-				}
-			}
-		}
-		statusText.setText("探索完了");
-		mainFrame.repaint();
-
-		for (String tn : existTaskNames) {
-			System.out.println(tn);
-		}
-
-		makeIdentificationFrame();
-
-	}
-
 	private void makeIdentificationFrame() {
+		// 名寄せ用のウインドウ生成
 		identificationFrame = new JFrame("名寄せウインドウ");
 		identificationFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		identificationFrame.setSize(400, 200);
@@ -161,21 +129,25 @@ public class DataController {
 		identificationPane.setLayout(new BoxLayout(identificationPane, BoxLayout.Y_AXIS));
 		BAScrollPane = new JScrollPane(identificationPane);
 
-		autoIdentification();
 		BAPanel = new ArrayList<BeforeAfterPanel>();
 		// TODO保存した名寄せ結果を読み込めるようにする
 
+		// 正しい課題名であれば自動で埋める
+		Map<String, String> tmpIdentifiNames = nameIdenti.autoIdentification(existTaskNames, mustCheckTaskNames);
+
+		// パネルをセット
 		for (Map.Entry<String, String> entry : tmpIdentifiNames.entrySet()) {
 			BeforeAfterPanel tmp = new BeforeAfterPanel(entry.getKey(), entry.getValue());
 			BAPanel.add(tmp);
 			identificationPane.add(tmp);
 		}
 
-		collectStartButton = new JButton("集計開始");
+		collectStartButton = new JButton("データ収集開始");
 		collectStartButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				// 名寄せした名前をMapへ
 				identifiNames = new HashMap<>();
 				for (BeforeAfterPanel bap : BAPanel) {
 					identifiNames.put(bap.getBeforeName(), bap.getAfterName());
@@ -184,12 +156,15 @@ public class DataController {
 				// TODO名寄せ結果をCSVか何かに保存
 
 				for (Map.Entry<String, String> entry : identifiNames.entrySet()) {
-					if (!entry.getValue().equals(""))
+					if (!entry.getValue().equals("")) {
 						System.out.println(entry.getKey() + " -> " + entry.getValue());
+					}
 				}
-
-				dataCollect();
-				outputCSVData();
+				// データ収集
+				collectData = new CollectData(studentNums);
+				collectData.dataCollect(taskRootPath.getDirectoryChildren(), identifiNames);
+				System.out.println("データ収集終了");
+				makeDataSavaFrame();
 			}
 
 		});
@@ -198,135 +173,53 @@ public class DataController {
 		identificationFrame.setVisible(true);
 	}
 
-	protected void outputCSVData() {
-		System.out.println("出力先のフォルダを選択");
-		JFileChooser fc = new JFileChooser(".");
-		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+	private void makeDataSavaFrame() {
+		dataSaveFrame = new JFrame("CSVに保存");
+		dataSaveFrame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+		dataSaveFrame.setSize(400, 200);
+		JButton compileCountButton = new JButton("コンパイル回数");
+		compileCountButton.addActionListener(new ActionListener() {
 
-		int selected = fc.showOpenDialog(identificationFrame);
-		if (selected == JFileChooser.APPROVE_OPTION) {
-			try (PrintWriter pw = new PrintWriter(new BufferedWriter(
-					new FileWriter(new File(fc.getSelectedFile(), System.currentTimeMillis() + ".csv"), false)));) { // milli秒.csvで保存
-				StringBuilder item = new StringBuilder();
-				item.append("StudentNumber");
-				item.append(",");
-				for (String mctn : mustCheckTaskNames) {
-					item.append(mctn);
-					item.append(",");
-				}
-				pw.println(item);
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// CSVに出力
+				System.out.println("出力先のフォルダを選択");
+				JFileChooser fc = new JFileChooser(".");
+				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
-				for (Integer snum : studentNums) {
-					StringBuilder line = new StringBuilder();
-					line.append(snum);
-					line.append(",");
-					for (String mctn : mustCheckTaskNames) {
-						Map<String, Integer> tmp = collectedCompileCount.get(snum);
-						if (tmp.containsKey(mctn)) {
-							line.append(tmp.get(mctn));
-							line.append(",");
-						} else {
-							line.append(0);
-							line.append(",");
-						}
-					}
-					pw.println(line);
-				}
-
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}
-
-		System.out.println("出力完了");
-	}
-
-	private void autoIdentification() {
-		// TODO表記ゆれを吸収する
-		// 現状は一字一句正しいファイル名のみ取得
-		tmpIdentifiNames = new HashMap<>();
-		for (String etn : existTaskNames) {
-			if (mustCheckTaskNames.contains(etn)) {
-				tmpIdentifiNames.put(etn, etn);
-			} else {
-				tmpIdentifiNames.put(etn, "");
-			}
-		}
-	}
-
-	private void makeDataSet() {
-
-		collectedCompileCount = new HashMap<>();
-		// 保存するMapを生成，初期化
-		for (Integer snum : studentNums) {
-			Map<String, Integer> tmp = new HashMap<>();
-			collectedCompileCount.put(snum, tmp);
-		}
-
-	}
-
-	private void dataCollect() {
-		makeDataSet();
-		List<CDirectory> lectures;
-		lectures = taskRootPath.getDirectoryChildren();
-		for (CDirectory lec : lectures) {
-			System.out.println(lec.toString());
-			List<CDirectory> students;
-			students = lec.getDirectoryChildren();
-			for (CDirectory sd : students) {
-				try {
-					PLProject pr = new PLProject(sd.getNameByString(), sd, sd.getAbsolutePath());
-					pr.load();
-					for (PLFile plFile : pr.getRootPackage().getFilesRecursively()) {
-						if (identifiNames.containsKey(plFile.getName())) {
-							PLMetricsCalculator calc = new PLMetricsCalculator(plFile);
-							collectedCompileCount.get(Integer.parseInt(sd.toString().split("-", 0)[0]))
-									.put(identifiNames.get(plFile.getName()), calc.getCompileCount());
-						}
-
-					}
-				} catch (Exception e) {
-					System.err.println(e);
-				}
-			}
-		}
-
-	}
-
-	static final String PROJECT_PATH = "H:\\H\\workspaces\\git\\LeDaCo\\LeaningDataCollector\\targetFiles";
-
-	public void test() {
-		CDirectory targetFiles = new CDirectory(new CPath(PROJECT_PATH));
-		List<CDirectory> lectures;
-		Set<String> taskName = new HashSet<>();
-		Map<String, String> wrongNameFix = new HashMap<>();
-		lectures = targetFiles.getDirectoryChildren();
-		for (CDirectory lec : lectures) {
-			List<CDirectory> students;
-			students = lec.getDirectoryChildren();
-			System.out.println(lec.getNameByString());
-			for (CDirectory sd : students) {
-				System.out.println("  " + sd.getNameByString());
-				try {
-					PLProject pr = new PLProject(sd.getNameByString(), sd, sd.getAbsolutePath());
-					pr.load();
-					for (PLFile plFile : pr.getRootPackage().getFilesRecursively()) {
-						taskName.add(plFile.getName());
-						PLMetricsCalculator calc = new PLMetricsCalculator(plFile);
-
-						System.out.println("   " + pr.getRootPackage().getName() + " " + plFile.getName() + " "
-								+ calc.getWorkingTime().getMinute());
-					}
-
-				} catch (Exception e) {
-					System.err.println(e);
+				int selected = fc.showOpenDialog(identificationFrame);
+				if (selected == JFileChooser.APPROVE_OPTION) {
+					saveAsCSV = new SaveAsCSV();
+					saveAsCSV.outputCSVData(fc.getSelectedFile(), mustCheckTaskNames, studentNums,
+							collectData.getCompileCount(), "CompileCount");
 				}
 
 			}
-		}
-		System.out.println("TaskNames");
-		for (String tn : taskName) {
-			System.out.println(tn);
-		}
+		});
+		JButton runCountButton = new JButton("実行回数");
+		runCountButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// CSVに出力
+				System.out.println("出力先のフォルダを選択");
+				JFileChooser fc = new JFileChooser(".");
+				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+				int selected = fc.showOpenDialog(identificationFrame);
+				if (selected == JFileChooser.APPROVE_OPTION) {
+					saveAsCSV = new SaveAsCSV();
+					saveAsCSV.outputCSVData(fc.getSelectedFile(), mustCheckTaskNames, studentNums,
+							collectData.getCompileCount(), "RunCount");
+				}
+
+			}
+		});
+
+		dataSaveFrame.setLayout(new BoxLayout(dataSaveFrame.getContentPane(), BoxLayout.Y_AXIS));
+		dataSaveFrame.add(compileCountButton);
+		dataSaveFrame.add(runCountButton);
+		dataSaveFrame.setVisible(true);
 	}
+
 }
