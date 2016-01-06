@@ -2,7 +2,11 @@ package allCollectDaraPres;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,6 +16,7 @@ import java.util.Set;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -50,6 +55,7 @@ public class DataController {
 	private Set<String> existTaskNames;
 	private List<String> mustCheckTaskNames;
 	private List<Integer> studentNums;
+	private Map<Integer, Map<String, Integer>> collectedCompileCount;
 
 	public DataController() {
 		initializer();
@@ -117,6 +123,7 @@ public class DataController {
 		lectures = taskRootPath.getDirectoryChildren();
 		existTaskNames = new HashSet<>();
 		for (CDirectory lec : lectures) {
+			System.out.println(lec.toString() + " start");
 			List<CDirectory> students;
 			students = lec.getDirectoryChildren();
 			for (CDirectory sd : students) {
@@ -175,13 +182,63 @@ public class DataController {
 
 				}
 				// TODO名寄せ結果をCSVか何かに保存
+
+				for (Map.Entry<String, String> entry : identifiNames.entrySet()) {
+					if (!entry.getValue().equals(""))
+						System.out.println(entry.getKey() + " -> " + entry.getValue());
+				}
+
 				dataCollect();
+				outputCSVData();
 			}
 
 		});
 		identificationPane.add(collectStartButton);
 		identificationFrame.add(BAScrollPane);
 		identificationFrame.setVisible(true);
+	}
+
+	protected void outputCSVData() {
+		System.out.println("出力先のフォルダを選択");
+		JFileChooser fc = new JFileChooser(".");
+		fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+		int selected = fc.showOpenDialog(identificationFrame);
+		if (selected == JFileChooser.APPROVE_OPTION) {
+			try (PrintWriter pw = new PrintWriter(new BufferedWriter(
+					new FileWriter(new File(fc.getSelectedFile(), System.currentTimeMillis() + ".csv"), false)));) { // milli秒.csvで保存
+				StringBuilder item = new StringBuilder();
+				item.append("StudentNumber");
+				item.append(",");
+				for (String mctn : mustCheckTaskNames) {
+					item.append(mctn);
+					item.append(",");
+				}
+				pw.println(item);
+
+				for (Integer snum : studentNums) {
+					StringBuilder line = new StringBuilder();
+					line.append(snum);
+					line.append(",");
+					for (String mctn : mustCheckTaskNames) {
+						Map<String, Integer> tmp = collectedCompileCount.get(snum);
+						if (tmp.containsKey(mctn)) {
+							line.append(tmp.get(mctn));
+							line.append(",");
+						} else {
+							line.append(0);
+							line.append(",");
+						}
+					}
+					pw.println(line);
+				}
+
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+
+		System.out.println("出力完了");
 	}
 
 	private void autoIdentification() {
@@ -197,8 +254,42 @@ public class DataController {
 		}
 	}
 
+	private void makeDataSet() {
+
+		collectedCompileCount = new HashMap<>();
+		// 保存するMapを生成，初期化
+		for (Integer snum : studentNums) {
+			Map<String, Integer> tmp = new HashMap<>();
+			collectedCompileCount.put(snum, tmp);
+		}
+
+	}
+
 	private void dataCollect() {
-		// TODO Auto-generated method stub
+		makeDataSet();
+		List<CDirectory> lectures;
+		lectures = taskRootPath.getDirectoryChildren();
+		for (CDirectory lec : lectures) {
+			System.out.println(lec.toString());
+			List<CDirectory> students;
+			students = lec.getDirectoryChildren();
+			for (CDirectory sd : students) {
+				try {
+					PLProject pr = new PLProject(sd.getNameByString(), sd, sd.getAbsolutePath());
+					pr.load();
+					for (PLFile plFile : pr.getRootPackage().getFilesRecursively()) {
+						if (identifiNames.containsKey(plFile.getName())) {
+							PLMetricsCalculator calc = new PLMetricsCalculator(plFile);
+							collectedCompileCount.get(Integer.parseInt(sd.toString().split("-", 0)[0]))
+									.put(identifiNames.get(plFile.getName()), calc.getCompileCount());
+						}
+
+					}
+				} catch (Exception e) {
+					System.err.println(e);
+				}
+			}
+		}
 
 	}
 
