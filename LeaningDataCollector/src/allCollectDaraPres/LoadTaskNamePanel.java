@@ -6,8 +6,8 @@ import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.swing.BoxLayout;
@@ -64,19 +64,26 @@ public class LoadTaskNamePanel extends JPanel {
 
 	}
 
-	public List<String> loadCSVString(String path) {
-		List<String> loadedList = new ArrayList<String>();
+	public Map<String, String> loadCSVString(String path) {
+		Map<String, String> loadedList = new LinkedHashMap<>();
 		try (FileReader fr = new FileReader(path); BufferedReader br = new BufferedReader(fr)) {
 
 			String line;
 			StringTokenizer token;
 			while ((line = br.readLine()) != null) {
 				token = new StringTokenizer(line, ",");
-				loadedList.add(token.nextToken());
+				String taskName = token.nextToken();
+				String lectureName = token.nextToken();
+
+				loadedList.put(taskName, lectureName);
+
 			}
 			br.close();
 		} catch (IOException e1) {
 			e1.printStackTrace();
+		}
+		for (Map.Entry<String, String> e : loadedList.entrySet()) {
+			System.out.println(e.getKey() + " : " + e.getValue());
 		}
 		return loadedList;
 	}

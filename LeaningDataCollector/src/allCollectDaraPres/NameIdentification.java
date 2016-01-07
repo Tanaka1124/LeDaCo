@@ -45,12 +45,12 @@ public class NameIdentification {
 		return existTaskNames;
 	}
 
-	public Map<String, String> autoIdentification(Set<String> existTaskNames, List<String> mustCheckTaskNames) {
+	public Map<String, String> autoIdentification(Set<String> existTaskNames, Map<String, String> mustCheckTaskNames) {
 		// TODO表記ゆれを吸収する
 		// 現状は一字一句正しいファイル名のみ取得
 		Map<String, String> tmpIdentifiNames = new TreeMap<>();
 		for (String etn : existTaskNames) {
-			if (mustCheckTaskNames.contains(etn)) {
+			if (mustCheckTaskNames.containsKey(etn)) {
 				tmpIdentifiNames.put(etn, etn);
 			} else {
 				tmpIdentifiNames.put(etn, "");

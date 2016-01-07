@@ -17,7 +17,8 @@ public class CollectData {
 		runCount = new DataSets(studentNums);
 	}
 
-	public void dataCollect(List<CDirectory> lectures, Map<String, String> identifiNames) {
+	public void dataCollect(List<CDirectory> lectures, Map<String, String> identifiNames,
+			Map<String, String> mustCheckTaskNames) {
 		// makeDataSet();
 		// lectures = taskRootPath.getDirectoryChildren();
 
@@ -31,7 +32,9 @@ public class CollectData {
 					PLProject pr = new PLProject(sd.getNameByString(), sd, sd.getAbsolutePath());
 					pr.load();
 					for (PLFile plFile : pr.getRootPackage().getFilesRecursively()) {
-						if (identifiNames.containsKey(plFile.getName())) {
+						// 他のlectureに同名のJavaファイルがあっても無視
+						if (identifiNames.containsKey(plFile.getName())
+								&& mustCheckTaskNames.get(identifiNames.get(plFile.getName())).equals(lec.toString())) {
 							PLMetricsCalculator calc = new PLMetricsCalculator(plFile);
 							compileCount.get(Integer.parseInt(sd.toString().split("-", 0)[0]))
 									.put(identifiNames.get(plFile.getName()), calc.getCompileCount());
@@ -41,6 +44,7 @@ public class CollectData {
 
 					}
 				} catch (Exception e) {
+
 					System.err.println(e);
 				}
 			}

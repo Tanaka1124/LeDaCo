@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SaveAsCSV {
-	public void outputCSVData(File selectedFile, List<String> mustCheckTaskNames, List<Integer> studentNums,
+	public void outputCSVData(File selectedFile, Map<String, String> mustCheckTaskNames, List<Integer> studentNums,
 			DataSets collectedData, String dataType) {
 
 		try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(
@@ -17,7 +17,7 @@ public class SaveAsCSV {
 			StringBuilder item = new StringBuilder();
 			item.append("StudentNumber");
 			item.append(",");
-			for (String mctn : mustCheckTaskNames) {
+			for (String mctn : mustCheckTaskNames.keySet()) {
 				item.append(mctn);
 				item.append(",");
 			}
@@ -27,7 +27,7 @@ public class SaveAsCSV {
 				StringBuilder line = new StringBuilder();
 				line.append(snum);
 				line.append(",");
-				for (String mctn : mustCheckTaskNames) {
+				for (String mctn : mustCheckTaskNames.keySet()) {
 					Map<String, Integer> tmp = collectedData.get(snum);
 					if (tmp.containsKey(mctn)) {
 						line.append(tmp.get(mctn));

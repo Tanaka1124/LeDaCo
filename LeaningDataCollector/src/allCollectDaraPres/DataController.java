@@ -49,7 +49,7 @@ public class DataController {
 
 	private Map<String, String> identifiNames;
 	private Set<String> existTaskNames;
-	private List<String> mustCheckTaskNames;
+	private Map<String, String> mustCheckTaskNames;
 	private List<Integer> studentNums;
 
 	public DataController() {
@@ -150,7 +150,8 @@ public class DataController {
 				// 名寄せした名前をMapへ
 				identifiNames = new HashMap<>();
 				for (BeforeAfterPanel bap : BAPanel) {
-					identifiNames.put(bap.getBeforeName(), bap.getAfterName());
+					if (!bap.getAfterName().equals(""))
+						identifiNames.put(bap.getBeforeName(), bap.getAfterName());
 
 				}
 				// TODO名寄せ結果をCSVか何かに保存
@@ -162,7 +163,7 @@ public class DataController {
 				}
 				// データ収集
 				collectData = new CollectData(studentNums);
-				collectData.dataCollect(taskRootPath.getDirectoryChildren(), identifiNames);
+				collectData.dataCollect(taskRootPath.getDirectoryChildren(), identifiNames, mustCheckTaskNames);
 				System.out.println("データ収集終了");
 				makeDataSavaFrame();
 			}
