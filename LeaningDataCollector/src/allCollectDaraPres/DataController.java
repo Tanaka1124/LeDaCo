@@ -33,7 +33,6 @@ public class DataController {
 
 	private NameIdentification nameIdenti;
 	private CollectData collectData;
-	private SaveAsCSV saveAsCSV;
 
 	private List<BeforeAfterPanel> BAPanel;
 	private JPanel identificationPane;
@@ -190,7 +189,7 @@ public class DataController {
 
 				int selected = fc.showOpenDialog(identificationFrame);
 				if (selected == JFileChooser.APPROVE_OPTION) {
-					saveAsCSV = new SaveAsCSV();
+					SaveAsCSV saveAsCSV = new SaveAsCSV();
 					saveAsCSV.outputCSVData(fc.getSelectedFile(), mustCheckTaskNames, studentNums,
 							collectData.getCompileCount(), "CompileCount");
 				}
@@ -209,9 +208,48 @@ public class DataController {
 
 				int selected = fc.showOpenDialog(identificationFrame);
 				if (selected == JFileChooser.APPROVE_OPTION) {
-					saveAsCSV = new SaveAsCSV();
+					SaveAsCSV saveAsCSV = new SaveAsCSV();
 					saveAsCSV.outputCSVData(fc.getSelectedFile(), mustCheckTaskNames, studentNums,
-							collectData.getCompileCount(), "RunCount");
+							collectData.getRunCount(), "RunCount");
+				}
+
+			}
+		});
+
+		JButton blockTimeButton = new JButton("ブロック編集時間");
+		blockTimeButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// CSVに出力
+				System.out.println("出力先のフォルダを選択");
+				JFileChooser fc = new JFileChooser(".");
+				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+				int selected = fc.showOpenDialog(identificationFrame);
+				if (selected == JFileChooser.APPROVE_OPTION) {
+					SaveAsCSV saveAsCSV = new SaveAsCSV();
+					saveAsCSV.outputCSVData(fc.getSelectedFile(), mustCheckTaskNames, studentNums,
+							collectData.getBlockWorkTime(), "BlockTime");
+				}
+
+			}
+		});
+		JButton textTimeButton = new JButton("テキスト編集時間");
+		textTimeButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// CSVに出力
+				System.out.println("出力先のフォルダを選択");
+				JFileChooser fc = new JFileChooser(".");
+				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+				int selected = fc.showOpenDialog(identificationFrame);
+				if (selected == JFileChooser.APPROVE_OPTION) {
+					SaveAsCSV saveAsCSV = new SaveAsCSV();
+					saveAsCSV.outputCSVData(fc.getSelectedFile(), mustCheckTaskNames, studentNums,
+							collectData.getTextWorkTime(), "textTime");
 				}
 
 			}
@@ -220,6 +258,8 @@ public class DataController {
 		dataSaveFrame.setLayout(new BoxLayout(dataSaveFrame.getContentPane(), BoxLayout.Y_AXIS));
 		dataSaveFrame.add(compileCountButton);
 		dataSaveFrame.add(runCountButton);
+		dataSaveFrame.add(blockTimeButton);
+		dataSaveFrame.add(textTimeButton);
 		dataSaveFrame.setVisible(true);
 	}
 

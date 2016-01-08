@@ -9,12 +9,16 @@ import pres.loader.model.PLProject;
 import pres.loader.utils.PLMetricsCalculator;
 
 public class CollectData {
-	private DataSets compileCount;
-	private DataSets runCount;
+	private DataSetsInteger compileCount;
+	private DataSetsInteger runCount;
+	private DataSetsLong textWorkTime;
+	private DataSetsLong blockWorkTime;
 
 	public CollectData(List<Integer> studentNums) {
-		compileCount = new DataSets(studentNums);
-		runCount = new DataSets(studentNums);
+		compileCount = new DataSetsInteger(studentNums);
+		runCount = new DataSetsInteger(studentNums);
+		textWorkTime = new DataSetsLong(studentNums);
+		blockWorkTime = new DataSetsLong(studentNums);
 	}
 
 	public void dataCollect(List<CDirectory> lectures, Map<String, String> identifiNames,
@@ -40,6 +44,10 @@ public class CollectData {
 									.put(identifiNames.get(plFile.getName()), calc.getCompileCount());
 							runCount.get(Integer.parseInt(sd.toString().split("-", 0)[0]))
 									.put(identifiNames.get(plFile.getName()), calc.getCompileCount());
+							textWorkTime.get(Integer.parseInt(sd.toString().split("-", 0)[0]))
+									.put(identifiNames.get(plFile.getName()), calc.getWorkingTime().getTime() / 1000);
+							blockWorkTime.get(Integer.parseInt(sd.toString().split("-", 0)[0]))
+									.put(identifiNames.get(plFile.getName()), calc.getBEWorkingTime().getTime() / 1000);
 						}
 
 					}
@@ -52,12 +60,20 @@ public class CollectData {
 
 	}
 
-	public DataSets getCompileCount() {
+	public DataSetsInteger getCompileCount() {
 		return compileCount;
 	}
 
-	public DataSets getRunCount() {
+	public DataSetsInteger getRunCount() {
 		return runCount;
+	}
+
+	public DataSetsLong getTextWorkTime() {
+		return textWorkTime;
+	}
+
+	public DataSetsLong getBlockWorkTime() {
+		return blockWorkTime;
 	}
 
 }
