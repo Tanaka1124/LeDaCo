@@ -18,9 +18,10 @@ public class LoadTaskPanel extends JPanel {
 	private JTextField rootPathArea;
 	private JPanel chooserPanel;
 
-	public LoadTaskPanel(DataController parent) {
+	public LoadTaskPanel(DataController parent, String path) {
 		chooserPanel = new JPanel();
 		rootPathArea = new JTextField(30);
+		rootPathArea.setText(path);
 		selButton = new JButton("選択");
 		selButton.addActionListener(new ActionListener() {
 

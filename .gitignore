@@ -3,3 +3,5 @@ LeaningDataCollector/.settings/org.eclipse.jdt.core.prefs
 */targetFiles
 */data2read
 */exportFiles
+LeaningDataCollector/targetFileLight/
+LeaningDataCollector/tmp.txt

@@ -28,10 +28,11 @@ public class LoadStudentNamePane extends JPanel {
 	private JTextField studentNamePathBox;
 	private JPanel chooserPanel;
 
-	public LoadStudentNamePane(DataController parent) {
+	public LoadStudentNamePane(DataController parent, String path) {
 
 		chooserPanel = new JPanel();
 		studentNamePathBox = new JTextField(30);
+		studentNamePathBox.setText(path);
 		selButton = new JButton("選択");
 		selButton.addActionListener(new ActionListener() {
 
@@ -64,7 +65,27 @@ public class LoadStudentNamePane extends JPanel {
 		return studentNamePathBox;
 	}
 
-	public List<Integer> getStudentData(String studentListPath) {
+	public List<String> getStudentData(String studentListPath) {
+		List<String> studentNum = new ArrayList<>();
+		File studentList = new File(studentListPath);
+
+		try (FileReader fr = new FileReader(studentList.getAbsolutePath().toString());
+				BufferedReader br = new BufferedReader(fr)) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				studentNum.add(line);
+			}
+			br.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		return studentNum;
+	}
+
+	// unused
+	// for road CSV
+	@Deprecated
+	public List<Integer> getStudentData4CSV(String studentListPath) {
 		List<Integer> studentNum = new ArrayList<>();
 		File studentList = new File(studentListPath);
 		List<String> temp = new ArrayList<>();

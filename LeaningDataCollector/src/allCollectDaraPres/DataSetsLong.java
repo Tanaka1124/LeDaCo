@@ -4,12 +4,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DataSetsLong extends HashMap<Integer, Map<String, Long>> {
+public class DataSetsLong extends HashMap<String, Map<String, Long>> {
 
-	public DataSetsLong(List<Integer> studentNums) {
-		for (Integer snum : studentNums) {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public DataSetsLong(List<String> studentNums) {
+		for (String snum : studentNums) {
 			Map<String, Long> tmp = new HashMap<>();
-			this.put(snum, tmp);
+			this.put(new StringBuilder(snum).insert(4, "-").toString(), tmp);
 		}
 	}
 

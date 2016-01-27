@@ -2,9 +2,9 @@ package allCollectDaraPres;
 
 import java.awt.FlowLayout;
 
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 public class BeforeAfterPanel extends JPanel {
 	/**
@@ -14,12 +14,14 @@ public class BeforeAfterPanel extends JPanel {
 
 	private JLabel beforeName;
 
-	private JTextField afterName;
+	private JComboBox<String> afterName;
 
-	public BeforeAfterPanel(String b, String a) {
+	public BeforeAfterPanel(String b, String[] aftterArray, String a) {
 		beforeName = new JLabel(b);
-		afterName = new JTextField(10);
-		afterName.setText(a);
+		afterName = new JComboBox<>(aftterArray);
+		afterName.setSelectedItem(a);
+		// System.out.println("before " + b + " after " + a + " " +
+		// b.equals(a));
 		this.setLayout(new FlowLayout());
 		this.add(beforeName);
 		this.add(afterName);
@@ -31,6 +33,6 @@ public class BeforeAfterPanel extends JPanel {
 	}
 
 	public String getAfterName() {
-		return afterName.getText();
+		return (String) afterName.getSelectedItem();
 	}
 }

@@ -8,7 +8,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -32,10 +34,11 @@ public class LoadTaskNamePanel extends JPanel {
 
 	private JPanel chooserPanel;
 
-	public LoadTaskNamePanel(DataController parent) {
+	public LoadTaskNamePanel(DataController parent, boolean task, String path) {
 
 		chooserPanel = new JPanel();
 		taskNamePathBox = new JTextField(30);
+		taskNamePathBox.setText(path);
 		selButton = new JButton("選択");
 		selButton.addActionListener(new ActionListener() {
 
@@ -59,9 +62,28 @@ public class LoadTaskNamePanel extends JPanel {
 		chooserPanel.add(selButton);
 
 		this.setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-		this.add(new JLabel("課題一覧のCSVを選択してください"));
+		if (task) {
+			this.add(new JLabel("課題一覧のCSVを選択してください"));
+		} else {
+			this.add(new JLabel("例題一覧のCSVを選択してください"));
+		}
 		this.add(chooserPanel);
 
+	}
+
+	public Set<String> loadCSVString4Ignore(String path) {
+		Set<String> loadedList = new TreeSet<>();
+		try (FileReader fr = new FileReader(path); BufferedReader br = new BufferedReader(fr)) {
+			String line;
+			while ((line = br.readLine()) != null) {
+				loadedList.add(line);
+			}
+			br.close();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+		return loadedList;
 	}
 
 	public Map<String, String> loadCSVString(String path) {

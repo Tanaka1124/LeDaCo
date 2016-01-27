@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public class SaveAsCSV {
-	public void outputCSVData(File selectedFile, Map<String, String> mustCheckTaskNames, List<Integer> studentNums,
+	public void outputCSVData(File selectedFile, Map<String, String> mustCheckTaskNames, List<String> studentNums,
 			DataSetsInteger collectedData, String dataType) {
 
 		try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(
@@ -23,7 +23,7 @@ public class SaveAsCSV {
 			}
 			pw.println(item);
 
-			for (Integer snum : studentNums) {
+			for (String snum : studentNums) {
 				StringBuilder line = new StringBuilder();
 				line.append(snum);
 				line.append(",");
@@ -47,7 +47,7 @@ public class SaveAsCSV {
 		System.out.println("出力完了");
 	}
 
-	public void outputCSVData(File selectedFile, Map<String, String> mustCheckTaskNames, List<Integer> studentNums,
+	public void outputCSVData(File selectedFile, Map<String, String> mustCheckTaskNames, List<String> studentNums,
 			DataSetsLong collectedData, String dataType) {
 		try (PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(
 				new File(selectedFile, dataType + "-" + System.currentTimeMillis() + ".csv"), false)));) { // milli秒.csvで保存
@@ -60,7 +60,7 @@ public class SaveAsCSV {
 			}
 			pw.println(item);
 
-			for (Integer snum : studentNums) {
+			for (String snum : studentNums) {
 				StringBuilder line = new StringBuilder();
 				line.append(snum);
 				line.append(",");
