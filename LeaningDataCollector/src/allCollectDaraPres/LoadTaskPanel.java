@@ -30,7 +30,7 @@ public class LoadTaskPanel extends JPanel {
 				// desktopを指定
 				// JFileChooser fc = new JFileChooser(new
 				// File(System.getProperty("user.home"), "Desktop").toString());
-				JFileChooser fc = new JFileChooser(".");
+				JFileChooser fc = new JFileChooser(path);
 				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 
 				int selected = fc.showOpenDialog(parent.getMainFrame());

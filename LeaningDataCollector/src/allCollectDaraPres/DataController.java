@@ -76,10 +76,10 @@ public class DataController {
 
 		tempDir = new CDirectory(new CPath(new File(".")));
 		List<String> tempPaths = new ArrayList<>();
-		tempPaths.add(" ");
-		tempPaths.add(" ");
-		tempPaths.add(" ");
-		tempPaths.add(" ");
+		tempPaths.add(".");
+		tempPaths.add(".");
+		tempPaths.add(".");
+		tempPaths.add(".");
 
 		if (tempDir.exists()) {
 			if (tempDir.findOrCreateFile(TEMP_FILE_NAME).loadTextAsList().size() >= 4) {
